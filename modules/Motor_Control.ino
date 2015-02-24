@@ -1,124 +1,156 @@
-/*
-*  This code is in the public domain.
-*  (Do whatever you want with it.)
-*/
+/*******************************
+ * Motor_Control.ino           *
+ * Author: Princeton Robotics: *
+ *         Quadcopter Team '15 *
+ * Date Created: 2/24/2015     *
+ * Description: Controls each  *
+ * of the motors from Arduino  *
+ * Serial Port.                *
+ *******************************/
 
-// Need the Servo library
+
+/* TODO:
+ *
+ * Right now, the Serial Monitor Controller
+ * code only accepts one value and sends that
+ * to all the motors. Have the Controller instead
+ * accept four values, and send one to each
+ * motor (as described below)
+ */
+
+
+/* USAGE:
+ *
+ * Ensure the motors are connected to OUTPUT ports
+ * on the arducopter APM, or PWM pins on another
+ * Arduino board. Change the #defines below so
+ * the pin number for each connected port is 
+ * correct.
+ *
+ * Motor names are based on mount position on
+ * the quadcopter: 'f': Front, 'b': Back,
+ * 'l': Left, and 'r': Right. So 'flMotor'
+ * corresponds to the 'front left motor'.
+ *
+ * When the code is uploaded, open the Serial
+ * Monitor, and ensure that either 'newline' or
+ * 'carriage return' is selected in the bottom
+ * right corner. You may now enter 4 numbers
+ * between 0 and 180 (with 180 as max power)
+ * separated by spaces, and those values will
+ * be sent to the motors. flMotor will set its
+ * power to the first number, frMotor to the
+ * second number, blMotor to the third, and
+ * brMotor to the fourth.
+ *
+ * An example line would be:
+ * 68 200 0 80
+ */
+
+
 #include <Servo.h>
 
-// This is our motor.
-Servo myMotor;
-Servo myMotor2;
+// Define which pin each motor is attached to
+#define FL_MOTOR 2
+#define FR_MOTOR 3
+#define BL_MOTOR 4
+#define BR_MOTOR 5
 
-// This is the final output
-// written to the motor.
+Servo flMotor;
+Servo frMotor;
+Servo blMotor;
+Servo brMotor;
+
 String incomingString;
 
 
-// Set everything up
 void setup()
 {
-  // Put the motor to Arduino pin #9
-  myMotor.attach(9);
-  myMotor2.attach(7);
+    flMotor.attach(FL_MOTOR);
+    frMotor.attach(FR_MOTOR);
+    blMotor.attach(BL_MOTOR);
+    brMotor.attach(BR_MOTOR);
 
-  // Required for I/O from Serial monitor
-  Serial.begin(9600);
-  // Print a startup message
-  Serial.println("initializing");
-  arm();
+    Serial.begin(9600);
+    Serial.println("Initalizing");
+    arm();
 }
-
 
 void loop()
 {
-  // If there is incoming value
-  if(Serial.available() > 0)
-  {
-    // read the value
-    char ch = Serial.read();
-    
-    if(ch == 'a') {
-      arm();
-    } else {
-  
-      /*
-      *  If ch isn't a newline
-      *  (linefeed) character,
-      *  we will add the character
-      *  to the incomingString
-      */
-      if (ch != 13){
-        // Print out the value received
-        // so that we can see what is
-        // happening
-        Serial.print("I have received: ");
-        Serial.print(ch, DEC);
-        Serial.print('\n');
-      
-        // Add the character to
-        // the incomingString
-        incomingString += ch;
-      }
-      // received a newline (linefeed) character
-      // this means we are done making a string
-      else
-      {
-        
-        if (incomingString == "a") return;
-        
-        // print the incoming string
-        Serial.println("I am printing the entire string");
-        Serial.println(incomingString);
-      
-        // Convert the string to an integer
-        int val = incomingString.toInt();
-      
-        // print the integer
-        Serial.println("Printing the value: ");
-        Serial.println(val);
-      
-        /*
-        *  We only want to write an integer between
-        *  0 and 180 to the motor. 
-        */
-        if (val > -1 && val < 181)
-       {
-         // Print confirmation that the
-         // value is between 0 and 180
-         Serial.println("Value is between 0 and 180");
-         // Write to Servo
-         myMotor.write(val);
-         myMotor2.write(val);
-       }
-       // The value is not between 0 and 180.
-       // We do not want write this value to
-       // the motor.
-       else
-       {
-         Serial.println("Value is NOT between 0 and 180");
-        
-         // IT'S a TRAP!
-         Serial.println("Error with the input");
-       }
-      
-        // Reset the value of the incomingString
-        incomingString = "";
-      }
+    // If the user has inputted something
+    if (Serial.available() > 0)
+    {
+        char c = Serial.read();
+
+        else
+        {
+            // If we haven't received a newline or
+            // carriage return character, add it to
+            // incomingString
+            if (ch != 10 && ch != 13) {
+                incomingString += ch;
+            }
+
+            // If we have received a newline or
+            // carriage return character, synthesize
+            // the string and send values to motors
+            else
+            {
+                // Input "a" to re-arm the ESCs
+                if (incomingString == "a") {
+                    arm();
+                }
+
+                int val = incomingString.toInt();
+
+                // Ensure val is between 0 to 180
+                if (val >= 0 && val <= 180)
+                {
+                    Serial.print("Sending Value: ");
+                    Serial.println(val);
+
+                    flMotor.write(val);
+                    frMotor.write(val);
+                    blMotor.write(val);
+                    brMotor.write(val);
+                }
+                else {
+                    Serial.println("Please enter value between 0 and 180.");
+                }
+
+                // Reset incomingString
+                incomingString = "";
+            }
+        }
     }
-  }
 }
 
-void arm(){
-  Serial.print("Arming");
-  myMotor.write(0);
-  myMotor2.write(0);
-  for (int i = 0; i < 5; i++){
-    Serial.print(".");
-    delay(1000);
-  }
-  myMotor.write(20);
-  myMotor2.write(20);
-  Serial.print("   Complete");
-}
 
+/* Arms the ESCs (Readies them for use)    *
+ * Arm Sequence: Send a value of 0, wait   *
+ * a brief period of time (~5 sec), then   *
+ * send a low value (~20). The ESCs should *
+ * beep during the arm sequence, but stop  *
+ * once it is complete.                    */
+void arm()
+{
+    Serial.print("Arming");
+
+    flMotor.write(0);
+    frMotor.write(0);
+    blMotor.write(0);
+    brMotor.write(0);
+
+    for (int i = 0; i < 5; i++) {
+        Serial.print(".");
+        delay(1000);
+    }
+
+    flMotor.write(20);
+    frMotor.write(20);
+    blMotor.write(20);
+    brMotor.write(20);
+
+    Serial.println("    Complete!");
+}
