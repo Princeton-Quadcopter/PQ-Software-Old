@@ -81,47 +81,44 @@ void loop()
     // If the user has inputted something
     if (Serial.available() > 0)
     {
-        char c = Serial.read();
+        char ch = Serial.read();
 
+        // If we haven't received a newline or
+        // carriage return character, add it to
+        // incomingString
+        if (ch != 10 && ch != 13) {
+            incomingString += ch;
+        }
+
+        // If we have received a newline or
+        // carriage return character, synthesize
+        // the string and send values to motors
         else
         {
-            // If we haven't received a newline or
-            // carriage return character, add it to
-            // incomingString
-            if (ch != 10 && ch != 13) {
-                incomingString += ch;
+            // Input "a" to re-arm the ESCs
+            if (incomingString == "a") {
+                arm();
             }
 
-            // If we have received a newline or
-            // carriage return character, synthesize
-            // the string and send values to motors
-            else
+            int val = incomingString.toInt();
+
+            // Ensure val is between 0 to 180
+            if (val >= 0 && val <= 180)
             {
-                // Input "a" to re-arm the ESCs
-                if (incomingString == "a") {
-                    arm();
-                }
+                Serial.print("Sending Value: ");
+                Serial.println(val);
 
-                int val = incomingString.toInt();
-
-                // Ensure val is between 0 to 180
-                if (val >= 0 && val <= 180)
-                {
-                    Serial.print("Sending Value: ");
-                    Serial.println(val);
-
-                    flMotor.write(val);
-                    frMotor.write(val);
-                    blMotor.write(val);
-                    brMotor.write(val);
-                }
-                else {
-                    Serial.println("Please enter value between 0 and 180.");
-                }
-
-                // Reset incomingString
-                incomingString = "";
+                flMotor.write(val);
+                frMotor.write(val);
+                blMotor.write(val);
+                brMotor.write(val);
             }
+            else {
+                Serial.println("Please enter value between 0 and 180.");
+            }
+
+            // Reset incomingString
+            incomingString = "";
         }
     }
 }
