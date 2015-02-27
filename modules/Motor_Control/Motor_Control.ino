@@ -99,28 +99,37 @@ void loop()
             if (incomingString == "a") {
                 arm();
             }
-
-            int val = incomingString.toInt();
-
-            // Ensure val is between 0 to 180
-            if (val >= 0 && val <= 180)
-            {
-                Serial.print("Sending Value: ");
-                Serial.println(val);
-
-                flMotor.write(val);
-                frMotor.write(val);
-                blMotor.write(val);
-                brMotor.write(val);
-            }
-            else {
-                Serial.println("Please enter value between 0 and 180.");
-            }
-
-            // Reset incomingString
+            
+            sendToMotors(incomingString);
             incomingString = "";
         }
     }
+}
+void sendToMotors(String str) {
+  int motorNum = 0;
+  String motorVal;
+  for(int i = 0; i < str.length(); i++) {
+       char c = str.charAt(i);
+       if(c == 32) { //32 is the ASCII number for a space
+         if(motorNum == 0) {
+          flMotor.write(motorVal.toInt()); 
+         }
+         if(motorNum == 1) {
+          frMotor.write(motorVal.toInt());
+         }
+         if(motorNum == 2) {
+          blMotor.write(motorVal.toInt());
+         }
+         if(motorNum == 3) {
+          brMotor.write(motorVal.toInt());
+         }
+         motorNum++;
+         motorVal = "";
+       }
+       else {
+        motorVal += c; 
+       }  
+  }
 }
 
 
@@ -130,6 +139,7 @@ void loop()
  * send a low value (~20). The ESCs should *
  * beep during the arm sequence, but stop  *
  * once it is complete.                    */
+
 void arm()
 {
     Serial.print("Arming");
