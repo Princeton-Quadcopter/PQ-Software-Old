@@ -24,7 +24,7 @@
  * Ensure the motors are connected to OUTPUT ports
  * on the arducopter APM, or PWM pins on another
  * Arduino board. Change the #defines below so
- * the pin number for each connected port is 
+ * the pin number for each connected port is
  * correct.
  *
  * Motor names are based on mount position on
@@ -99,37 +99,62 @@ void loop()
             if (incomingString == "a") {
                 arm();
             }
-            
+
+            // Send values to motors and
+            // clear incomingString
             sendToMotors(incomingString);
             incomingString = "";
         }
     }
 }
-void sendToMotors(String str) {
-  int motorNum = 0;
-  String motorVal;
-  for(int i = 0; i < str.length(); i++) {
-       char c = str.charAt(i);
-       if(c == 32) { //32 is the ASCII number for a space
-         if(motorNum == 0) {
-          flMotor.write(motorVal.toInt()); 
-         }
-         if(motorNum == 1) {
-          frMotor.write(motorVal.toInt());
-         }
-         if(motorNum == 2) {
-          blMotor.write(motorVal.toInt());
-         }
-         if(motorNum == 3) {
-          brMotor.write(motorVal.toInt());
-         }
-         motorNum++;
-         motorVal = "";
-       }
-       else {
-        motorVal += c; 
-       }  
-  }
+
+/* Accepts a string containing four integers  *
+ * and sends each of those values to a motor. */
+void sendToMotors(String str)
+{
+    String motorString;
+    int motorNum = 0;
+
+    for(int i = 0; i < str.length(); i++)
+    {
+        char c = str.charAt(i);
+
+        // When we find a space character,
+        // parse the string as an int and
+        // send it to the proper motor.
+        if(c == 32)
+        {
+            int motorVal = motorString.toInt();
+
+            // Ensure that motorVal is between 0 and 180
+            if (motorVal < 0 || motorVal > 180) {
+                Serial.println("Please input a value between 0 - 180 for the motors");
+                motorNum++;
+                continue;
+            }
+
+            if(motorNum == 0) {
+                flMotor.write(motorVal);
+            }
+            if(motorNum == 1) {
+                frMotor.write(motorVal);
+            }
+            if(motorNum == 2) {
+                blMotor.write(motorVal);
+            }
+            if(motorNum == 3) {
+                brMotor.write(motorVal);
+            }
+            motorNum++;
+            motorVal = "";
+        }
+
+        // If c is not a space character,
+        // append it to motorVal string.
+        else {
+            motorVal += c;
+        }
+    }
 }
 
 
@@ -139,7 +164,6 @@ void sendToMotors(String str) {
  * send a low value (~20). The ESCs should *
  * beep during the arm sequence, but stop  *
  * once it is complete.                    */
-
 void arm()
 {
     Serial.print("Arming");
