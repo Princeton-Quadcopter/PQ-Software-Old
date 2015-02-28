@@ -44,7 +44,7 @@
  * brMotor to the fourth.
  *
  * An example line would be:
- * 68 200 0 80
+ * 68 100 0 80
  */
 
 
@@ -107,7 +107,7 @@ void loop()
               // Send values to motors
               sendToMotors(incomingString);
             }
-
+			
             // clear incomingString
             incomingString = "";
         }
@@ -128,30 +128,31 @@ void sendToMotors(String str)
         // When we find a space character,
         // parse the string as an int and
         // send it to the proper motor.
-        int motorVal;
-        if(c == 32)
+        if (c == 32)
         {
-            motorVal = motorString.toInt();
+            int motorVal = motorString.toInt();
 
             // Ensure that motorVal is between 0 and 180
             if (motorVal < 0 || motorVal > 180) {
                 Serial.println("Please input a value between 0 - 180 for the motors");
-                motorNum++;
-                continue;
             }
 
-            if(motorNum == 0) {
-                flMotor.write(motorVal);
+            else
+            {
+                if (motorNum == 0) {
+                    flMotor.write(motorVal);
+                }
+                if (motorNum == 1) {
+                    frMotor.write(motorVal);
+                }
+                if (motorNum == 2) {
+                    blMotor.write(motorVal);
+                }
+                if (motorNum == 3) {
+                    brMotor.write(motorVal);
+                }
             }
-            if(motorNum == 1) {
-                frMotor.write(motorVal);
-            }
-            if(motorNum == 2) {
-                blMotor.write(motorVal);
-            }
-            if(motorNum == 3) {
-                brMotor.write(motorVal);
-            }
+
             motorNum++;
             motorString = "";
         }

@@ -1,0 +1,8 @@
+Useful Links
+============
+
+Documentation on APM Board Hardware (Scroll down a bit):
+http://3drobotics.com/learn/?_ga=1.239061762.386821550.1413499915
+
+Tutorial on how to load code onto the APM:
+http://dev.ardupilot.com/wiki/load-the-code-onto-apm2x/
