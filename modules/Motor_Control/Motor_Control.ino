@@ -100,11 +100,15 @@ void loop()
             // Input "a" to re-arm the ESCs
             if (incomingString == "a") {
                 arm();
+            } else if (incomingString == "x") {
+              // Safety
+              sendToMotors("0 0 0 0");
+            } else {
+              // Send values to motors
+              sendToMotors(incomingString);
             }
 
-            // Send values to motors and
             // clear incomingString
-            sendToMotors(incomingString);
             incomingString = "";
         }
     }
