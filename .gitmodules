@@ -1,0 +1,3 @@
+[submodule "libraries/i2cdevlib"]
+	path = libraries/i2cdevlib
+	url = https://github.com/jrowberg/i2cdevlib
