@@ -51,6 +51,8 @@
 #include <Servo.h>
 
 // Define which pin each motor is attached to
+// FL is pin 7
+// FR is pin 6
 #define FL_MOTOR 2
 #define FR_MOTOR 3
 #define BL_MOTOR 4
@@ -122,9 +124,10 @@ void sendToMotors(String str)
         // When we find a space character,
         // parse the string as an int and
         // send it to the proper motor.
+        int motorVal;
         if(c == 32)
         {
-            int motorVal = motorString.toInt();
+            motorVal = motorString.toInt();
 
             // Ensure that motorVal is between 0 and 180
             if (motorVal < 0 || motorVal > 180) {
@@ -146,13 +149,13 @@ void sendToMotors(String str)
                 brMotor.write(motorVal);
             }
             motorNum++;
-            motorVal = "";
+            motorString = "";
         }
 
         // If c is not a space character,
         // append it to motorVal string.
         else {
-            motorVal += c;
+            motorString += c;
         }
     }
 }
