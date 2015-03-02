@@ -53,6 +53,8 @@
 // Define which pin each motor is attached to
 // FL is pin 7
 // FR is pin 6
+// BR is pin 8
+// BL not working
 #define FL_MOTOR 2
 #define FR_MOTOR 3
 #define BL_MOTOR 4
@@ -102,7 +104,7 @@ void loop()
                 arm();
             } else if (incomingString == "x") {
               // Safety
-              sendToMotors("0 0 0 0");
+              sendToMotors("55 55 55 55");
             } else {
               // Send values to motors
               sendToMotors(incomingString);
@@ -120,48 +122,26 @@ void sendToMotors(String str)
 {
     String motorString;
     int motorNum = 0;
-
-    for(int i = 0; i < str.length(); i++)
+    char *temp = (char*)str.c_str();
+    char *pch = strtok(temp," ");
+    while (pch != NULL)
     {
-        char c = str.charAt(i);
-
-        // When we find a space character,
-        // parse the string as an int and
-        // send it to the proper motor.
-        if (c == 32)
-        {
-            int motorVal = motorString.toInt();
-
-            // Ensure that motorVal is between 0 and 180
-            if (motorVal < 0 || motorVal > 180) {
-                Serial.println("Please input a value between 0 - 180 for the motors");
-            }
-
-            else
-            {
-                if (motorNum == 0) {
-                    flMotor.write(motorVal);
-                }
-                if (motorNum == 1) {
-                    frMotor.write(motorVal);
-                }
-                if (motorNum == 2) {
-                    blMotor.write(motorVal);
-                }
-                if (motorNum == 3) {
-                    brMotor.write(motorVal);
-                }
-            }
-
-            motorNum++;
-            motorString = "";
-        }
-
-        // If c is not a space character,
-        // append it to motorVal string.
-        else {
-            motorString += c;
-        }
+      int curr = atoi(pch);
+      if (motorNum == 0) {
+          flMotor.write(curr);
+      }
+      if (motorNum == 1) {
+          frMotor.write(curr);
+      }
+      if (motorNum == 2) {
+          blMotor.write(curr);
+      }
+      if (motorNum == 3) {
+          brMotor.write(curr);
+      }
+//      Serial.println(curr);
+      pch = strtok(NULL, " ");
+      motorNum++;
     }
 }
 
