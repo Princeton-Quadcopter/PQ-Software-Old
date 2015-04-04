@@ -57,7 +57,7 @@
 // BL not working
 #define FL_MOTOR 2
 #define FR_MOTOR 3
-#define BL_MOTOR 4
+#define BL_MOTOR 6
 #define BR_MOTOR 5
 
 Servo flMotor;
