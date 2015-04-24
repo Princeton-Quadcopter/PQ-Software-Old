@@ -57,8 +57,10 @@
 // BL not working
 #define FL_MOTOR 2
 #define FR_MOTOR 3
-#define BL_MOTOR 4
+#define BL_MOTOR 6
 #define BR_MOTOR 5
+
+#define EMERGENCY_SHUT_DOWN 
 
 Servo flMotor;
 Servo frMotor;
@@ -108,6 +110,10 @@ void loop()
             } else {
               // Send values to motors
               sendToMotors(incomingString);
+#ifdef EMERGENCY_SHUT_DOWN
+              delay(5000);
+              sendToMotors("55 55 55 55");
+#endif
             }
 			
             // clear incomingString
