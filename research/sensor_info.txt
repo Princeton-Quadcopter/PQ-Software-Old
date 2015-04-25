@@ -1,0 +1,4 @@
+Sensor Detail;
+
+MPU6050 Magnometer:
+ - SDA: Pin 20, SC: Pin 21

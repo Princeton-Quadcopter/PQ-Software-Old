@@ -1,0 +1,5 @@
+Dev Guide
+===========
+
+Using Submodules:
+ - To use a class from a submodule (such as i2cdevlib), run 'git submodule init' followed by 'git submodule update' while in the submodule directory. You may then import the library by pressing 'Sketch -> Import Library -> Add Library' while in the Arduino IDE, and navigating to the folder containing the classes. You can then import the actual classes by using 'Sketch -> Import Library -> <Your library class>'
