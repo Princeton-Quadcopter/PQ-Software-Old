@@ -11,6 +11,7 @@ IMU::IMU()
     TWBR = 24;
 
     // Initialize the MPU
+    Serial.println("Initializing IMU...")
     mpu = new MPU6050();
     mpu.initialize();
     deviceStatus = mpu.dmpInitialize();
@@ -24,16 +25,28 @@ IMU::IMU()
     // If it worked...
     if (deviceStatus == 0)
     {
+        // Enable DMP
         Serial.println("Enabling IMU DMP");
         mpu.setDMPEnabled(true);
 
+        // Enable Interrupt detection
         Serial.println("Enabing IMU interrupt detection");
         attachInterrupt(0, dmpDataReady, RISING);
+        mpuIntStatus = mpu.getIntStatus();
 
+        // Everything worked!
+        Serial.println("DMP ready!");
+        dmpReady = true;
+        packetSize = mpu.dmpGetFIFOPacketSize();
     }
-    
-    // TODO: Finish Initialization
-}
+
+    // Error initializing device
+    else {
+        Serial.print(F("IMU DMP Initialization failed (code "));
+        Serial.print(devStatus);
+        Serial.println(F(")"));
+    }
+}    
 
 // Performs a device reset on the IMU
 void IMU::reset() {
